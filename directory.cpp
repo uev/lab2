@@ -26,6 +26,7 @@ MyDirectory::MyDirectory(char const *fname)
    else
    {
 	   do {
+
 		   counеf+=1;
 		   memset(buf,0,sizeof(buf)); // clean buffer
 		   strcpy(buf,parrent);
@@ -104,6 +105,74 @@ void MyDirectory::rmF(char *fp){
 MyDirectory::~MyDirectory()
 {
 }
+
+int MyDirectory::du(){
+	int du =0; // размер каталога
+	for(HMIterator=HashFiles.begin(); HMIterator != HashFiles.end(); HMIterator++)
+		{
+			du += HMIterator->second->size;
+		}
+
+	return du;
+}
+
+void MyDirectory::findByName (char *name){
+	printf("\nTry find file by name %s\n",name);
+	if (HashFiles.find(name) == HashFiles.end()){
+		puts("Sorry... file not found");
+	} else {
+		printf("File %s founded\n",name);
+	}
+}
+
+
+
+void MyDirectory::findByExt (char *ext){
+	int flag=0; // установится в 1 если есть файлы с указанным расщирением
+	char buf[10]={'.'};
+	if (strchr(ext,'.') == NULL){
+		strcat(buf,ext);
+	} else {
+		strcpy(buf,ext);
+	}
+	printf("\nTry find file by extension %s\n",buf);
+	for(HMIterator=HashFiles.begin(); HMIterator != HashFiles.end(); HMIterator++) {
+		if (strcmp(HMIterator->second->ext,buf) == 0) {
+			flag+=1;
+			printf("%s\%s\%s\n",HMIterator->second->drive,HMIterator->second->dir, HMIterator->second->fname);
+		}
+	}
+	if (flag == 0) {
+		printf("Files by extension %s not founded\n",ext);
+	}
+}
+
+void MyDirectory::findByDate (char *ext){
+	int flag=0; // установится в 1 если есть файлы с указанным расщирением
+	printf("\nTry find file by date %s\n",ext);
+	for(HMIterator=HashFiles.begin(); HMIterator != HashFiles.end(); HMIterator++) {
+		if (strstr(HMIterator->second->time_mod,ext) != NULL) {
+			flag+=1;
+			printf("%s\%s\%s   %s\n",HMIterator->second->drive,HMIterator->second->dir, HMIterator->second->fname,HMIterator->second->time_mod);
+		}
+	}
+	if (flag == 0) {
+		printf("Files by date %s not founded\n",ext);
+	}
+}
+
+void MyDirectory::merge(MyDirectory r) {
+	char path[1024];
+	puts("Try merge...");
+	for(r.HMIterator=r.HashFiles.begin(); r.HMIterator != r.HashFiles.end(); r.HMIterator++) {
+		memset(path,0,sizeof(path));
+		strncat(path,parrent,strlen(parrent));	
+		strncat(path,r.HMIterator->second->fname,strlen(r.HMIterator->second->fname));	
+		HashFiles[r.HMIterator->second->fname] = new FileFactory(path,r.HMIterator->second->time_mod); // init file			
+		HashFiles[r.HMIterator->second->fname]->size =  r.HMIterator->second->size; // размер файла
+}
+}
+
 
 void FileFactory::PrepareFileFactory(char *path){
 	brakeFlags();

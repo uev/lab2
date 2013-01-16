@@ -49,9 +49,11 @@ public:
 	int countfile();
 	int addF(char *path);
 	void rmF(char *name); // +
-	void find();
+	void findByName(char *);
+	void findByExt(char *);
+	void findByDate(char *);
 	int du();
-	void merge();
+	void merge(MyDirectory r);
 	void ls(); // watching derectiry
 
 private:

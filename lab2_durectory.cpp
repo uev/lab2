@@ -19,6 +19,19 @@ int _tmain(int argc, _TCHAR* argv[])
 	d->addF("c:\\autoexec.bat");
 	printf("\n Try add file \n");
 	d->ls();
+
+	printf("\n Ves %d\n", d->du());
+//	d->findByName("autoexec.bat");
+//	d->findByName("dsds");
+//	d->findByExt("sdf");
+//	d->findByDate("Jan 10");
+//	d->findByDate("Jan 11");
+	//sample merge
+	char const *rname = "c:\\WINDOWS\\";
+	MyDirectory r = MyDirectory(rname);
+	d->merge(r);
+	printf("\n Ves %d\n", d->du());
+	//d->ls();
 	return 0;
 }
 
