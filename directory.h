@@ -31,13 +31,7 @@ public:
 class MyDirectory
 {
 public:
-	typedef struct { //определение структуры файла в каталоге
-		char name; // имя
-		char date; // дата изменения
-		int flag_sel; // признак выделения
-		int flag_rm; // признак удаления
-		int size;
-} FItem;
+
 	struct stat finfo; // attribute structure
 	map <string,FileFactory*> HashFiles; // структура для хранения файлов
 	map <string,FileFactory*> :: iterator HMIterator; // итератор для словаря
@@ -54,10 +48,15 @@ public:
 	void findByDate(char *);
 	int du();
 	void merge(MyDirectory r);
+	void cross(MyDirectory r);
 	void ls(); // watching derectiry
+	void userMagic(); // имитация пользовательской дейтельности с файлами
+	//групповые операции
+	void groupRm(); // файлы к удалению
+	void groupSel(); // выделенные файлы
+	void groupLessSize(int size); //меньше определённого размена
+	void groupMoreSize(int size); //больше определённого размера
 
-private:
-	
-	FItem l[255];
+
 };
 

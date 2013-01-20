@@ -26,7 +26,6 @@ MyDirectory::MyDirectory(char const *fname)
    else
    {
 	   do {
-
 		   counеf+=1;
 		   memset(buf,0,sizeof(buf)); // clean buffer
 		   strcpy(buf,parrent);
@@ -36,34 +35,6 @@ MyDirectory::MyDirectory(char const *fname)
 	   } while(_findnext( hFile, &c_file ) == 0);
 	   _findclose( hFile );
 	   counеf = countfile();
-	 //  printf( "Listing of .c files\n\n" );
-      //printf( "RDO HID SYS ARC  FILE         DATE %25c SIZE\n", ' ' );
-      //printf( "--- --- --- ---  ----         ---- %25c ----\n", ' ' );
-      
-	   
-	/*
-	do {
-		   strcpy(&l[i].name, c_file.name);
-		   //printf("%s\n",ctime(&c_file.time_write));
-			strcpy(&l[i].date, ctime(&c_file.time_write));
-			l[i].flag_sel = -1;
-			l[i].flag_rm = -1;
-		   //printf("%s\n", &c_file.time_write);
-		
-			 char buffer[30];
-         printf( ( c_file.attrib & _A_RDONLY ) ? " Y  " : " N  " );
-         printf( ( c_file.attrib & _A_HIDDEN ) ? " Y  " : " N  " );
-         printf( ( c_file.attrib & _A_SYSTEM ) ? " Y  " : " N  " );
-         printf( ( c_file.attrib & _A_ARCH )   ? " Y  " : " N  " );
-         //ctime_s( buffer, _countof(buffer), &c_file.time_write );
-         printf( " %-12s %.24s  %9ld\n",
-            c_file.name, buffer, c_file.size );		
-			i+=1;
-	   } while( _findnext( hFile, &c_file ) == 0 );
-      _findclose( hFile );
-	  strcpy(&l[i].name, "\0");
-   }
-*/
 }
 }
 
@@ -118,6 +89,7 @@ int MyDirectory::du(){
 
 void MyDirectory::findByName (char *name){
 	printf("\nTry find file by name %s\n",name);
+	printf("Path ; Size ; Timestemp ; Is_select ; Is_remove \n");
 	if (HashFiles.find(name) == HashFiles.end()){
 		puts("Sorry... file not found");
 	} else {
@@ -136,6 +108,7 @@ void MyDirectory::findByExt (char *ext){
 		strcpy(buf,ext);
 	}
 	printf("\nTry find file by extension %s\n",buf);
+	printf("Path ; Size ; Timestemp ; Is_select ; Is_remove \n");
 	for(HMIterator=HashFiles.begin(); HMIterator != HashFiles.end(); HMIterator++) {
 		if (strcmp(HMIterator->second->ext,buf) == 0) {
 			flag+=1;
@@ -150,6 +123,7 @@ void MyDirectory::findByExt (char *ext){
 void MyDirectory::findByDate (char *ext){
 	int flag=0; // установится в 1 если есть файлы с указанным расщирением
 	printf("\nTry find file by date %s\n",ext);
+	printf("Path ; Size ; Timestemp ; Is_select ; Is_remove \n");
 	for(HMIterator=HashFiles.begin(); HMIterator != HashFiles.end(); HMIterator++) {
 		if (strstr(HMIterator->second->time_mod,ext) != NULL) {
 			flag+=1;
@@ -164,6 +138,7 @@ void MyDirectory::findByDate (char *ext){
 void MyDirectory::merge(MyDirectory r) {
 	char path[1024];
 	puts("Try merge...");
+	printf("Path ; Size ; Timestemp ; Is_select ; Is_remove \n");
 	for(r.HMIterator=r.HashFiles.begin(); r.HMIterator != r.HashFiles.end(); r.HMIterator++) {
 		memset(path,0,sizeof(path));
 		strncat(path,parrent,strlen(parrent));	
@@ -174,6 +149,74 @@ void MyDirectory::merge(MyDirectory r) {
 }
 
 
+void MyDirectory::cross(MyDirectory r) {
+	puts("\nFind Crossing...");
+	printf("Path ; Size ; Timestemp ; Is_select ; Is_remove \n");
+	for(HMIterator=HashFiles.begin(); HMIterator != HashFiles.end(); HMIterator++) {
+		if (r.HashFiles.find(HMIterator->second->fname) != r.HashFiles.end()) {
+			printf("%s\%s\%s\ ;	%ld ; %s; %d; %d\n",HMIterator->second->drive,HMIterator->second->dir,
+				HMIterator->second->fname,HMIterator->second->size, HMIterator->second->time_mod,
+				HMIterator->second->flag_sel,HMIterator->second->flag_rm);
+		}
+	}
+}
+
+void MyDirectory::userMagic(){
+	int p = 0;
+	for(HMIterator=HashFiles.begin(); HMIterator != HashFiles.end(); HMIterator++) {
+		rand() % 2 > 0 ? HMIterator->second->flag_rm = 1 :  HMIterator->second->flag_rm = 0 ;
+		rand() % 2 > 0 ? HMIterator->second->flag_sel = 1 : HMIterator->second->flag_sel = 0;
+		}
+}
+
+void MyDirectory::groupSel(){
+	puts("\n\Files selected\n");
+	printf("Path ; Size ; Timestemp ; Is_select ; Is_remove \n");
+	for(HMIterator=HashFiles.begin(); HMIterator != HashFiles.end(); HMIterator++) {
+		if (HMIterator->second->flag_sel > 0) {
+			printf("%s\%s\%s\ ;	%ld ; %s; %d; %d\n",HMIterator->second->drive,HMIterator->second->dir,
+				HMIterator->second->fname,HMIterator->second->size, HMIterator->second->time_mod,
+				HMIterator->second->flag_sel,HMIterator->second->flag_rm);
+		}
+	}
+}
+
+void MyDirectory::groupRm(){
+	puts("\n\Files to remove\n");
+	printf("Path ; Size ; Timestemp ; Is_select ; Is_remove \n");
+	for(HMIterator=HashFiles.begin(); HMIterator != HashFiles.end(); HMIterator++) {
+		if (HMIterator->second->flag_rm > 0) {
+			printf("%s\%s\%s\ ;	%ld ; %s; %d; %d\n",HMIterator->second->drive,HMIterator->second->dir,
+				HMIterator->second->fname,HMIterator->second->size, HMIterator->second->time_mod,
+				HMIterator->second->flag_sel,HMIterator->second->flag_rm);
+		}
+	}
+}
+
+void MyDirectory::groupLessSize(int size){
+	puts("\n\Files less size\n");
+	printf("Path ; Size ; Timestemp ; Is_select ; Is_remove \n");
+	for(HMIterator=HashFiles.begin(); HMIterator != HashFiles.end(); HMIterator++) {
+		if (HMIterator->second->size < size) {
+			printf("%s\%s\%s\ ;	%ld ; %s; %d; %d\n",HMIterator->second->drive,HMIterator->second->dir,
+				HMIterator->second->fname,HMIterator->second->size, HMIterator->second->time_mod,
+				HMIterator->second->flag_sel,HMIterator->second->flag_rm);
+		}
+	}
+}
+
+void MyDirectory::groupMoreSize(int size){
+	puts("\n\Files more size\n");
+	printf("Path ; Size ; Timestemp ; Is_select ; Is_remove \n");
+	for(HMIterator=HashFiles.begin(); HMIterator != HashFiles.end(); HMIterator++) {
+		if (HMIterator->second->size > size) {
+			printf("%s\%s\%s\ ;	%ld ; %s; %d; %d\n",HMIterator->second->drive,HMIterator->second->dir,
+				HMIterator->second->fname,HMIterator->second->size, HMIterator->second->time_mod,
+				HMIterator->second->flag_sel,HMIterator->second->flag_rm);
+		}
+	}
+}
+
 void FileFactory::PrepareFileFactory(char *path){
 	brakeFlags();
 	_splitpath(path,drive,dir,fname,ext);
@@ -182,7 +225,7 @@ void FileFactory::PrepareFileFactory(char *path){
 
 FileFactory::FileFactory(char *path){
 	PrepareFileFactory(path);
-	//HashFiles[strcat(fname,ext)] = new FileFactory(strcat(fname,ext),_ctime64(&c.st_ctime)); // init file
+	
 }
 
 //time decorator
